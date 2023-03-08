@@ -2,5 +2,14 @@
   width: 30px;
   height:  30px ;
   border: 1px solid black ;
-  margin: 1px;
+  margin: 0.5px;
+}
+.start{
+  background-color: green;
+}
+.finish{
+  background-color: red;
+}
+.wall{
+  background-color: black;
 }
