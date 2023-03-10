@@ -1,6 +1,5 @@
 import classes from './Node.module.css'
 import { motion } from 'framer-motion'
-import { useState } from 'react'
 
 const Node = ({
 	path,
@@ -8,11 +7,23 @@ const Node = ({
 	paintWallBtn,
 	paintWall,
 	setPaintWall,
+	startBtn,
+	endBtn,
 }) => {
 	const handleClick = (row, col) => {
-		const isStart = false
-		const isFinish = true
-		handleChangeNode(row, col, isStart, isFinish)
+		let isStart = false
+		let isFinish = false
+		let isWall = false
+		if (startBtn) {
+			isStart = true
+		}
+		if (endBtn) {
+			isFinish = true
+		}
+		if (paintWallBtn) {
+			isWall = true
+		}
+		handleChangeNode(row, col, isStart, isFinish, isWall)
 	}
 	const handlePaintWallStart = () => {
 		if (!paintWallBtn) return
@@ -28,7 +39,7 @@ const Node = ({
 		if (!paintWallBtn) return
 		setPaintWall(false)
 	}
-	console.log(1)
+
 	return path.map((col, index) => (
 		<motion.div
 			initial={{ opacity: 0 }}
