@@ -12,7 +12,7 @@ const Path = () => {
 	const [startNode, setStartNode] = useState([])
 	const [endBtn, setEndBtn] = useState(false)
 	const [endNode, setEndNode] = useState([])
-	console.log(startNode, endNode)
+
 	useEffect(() => {
 		let nodes = []
 		for (let row = 0; row < 15; row++) {
@@ -24,6 +24,9 @@ const Path = () => {
 					isStart: false,
 					isFinish: false,
 					isWall: false,
+					distance: Infinity,
+					isVisited: false,
+					previousNode: null,
 				}
 				currentRow.push(currentNode)
 			}
@@ -39,22 +42,17 @@ const Path = () => {
 		isWall = false
 	) => {
 		let newPathes = [...pathes]
-		const newNode = {
-			row,
-			col,
-			isStart,
-			isFinish,
-			isWall,
-			distance: Infinity,
-			isVisited: false,
-			previousNode: null,
-		}
-		if (isStart && startNode.length > 0) {
-			newPathes[startNode[0]][startNode[1]].isStart = false
+
+		if (isStart) {
+			if (startNode.length > 0) {
+				newPathes[startNode[0]][startNode[1]].isStart = false
+				newPathes[startNode[0]][startNode[1]].distance = Infinity
+			}
 			newPathes[row][col].isStart = true
+			newPathes[row][col].distance = 0
 		}
-		if (isFinish && endNode.length > 0) {
-			newPathes[endNode[0]][endNode[1]].isFinish = false
+		if (isFinish) {
+			if (endNode.length > 0) newPathes[endNode[0]][endNode[1]].isFinish = false
 			newPathes[row][col].isFinish = true
 		}
 		if (isWall) {
@@ -69,19 +67,19 @@ const Path = () => {
 
 	const handleSetBtn = (string) => {
 		if (string === 'start') {
-			setStartBtn(true)
+			setStartBtn(!startBtn)
 			setEndBtn(false)
 			setPaintWallBtn(false)
 		}
 		if (string === 'end') {
 			setStartBtn(false)
-			setEndBtn(true)
+			setEndBtn(!endBtn)
 			setPaintWallBtn(false)
 		}
 		if (string === 'wall') {
 			setStartBtn(false)
 			setEndBtn(false)
-			setPaintWallBtn(true)
+			setPaintWallBtn(!paintWallBtn)
 		}
 	}
 	const handleStopPainting = () => {
@@ -109,7 +107,7 @@ const Path = () => {
 		setPaintWallBtn(false)
 	}
 	const handleRunDijkstraBtn = () => {
-		console.log(dijkstra())
+		console.log(dijkstra(pathes, startNode, endNode))
 	}
 	return (
 		<>
