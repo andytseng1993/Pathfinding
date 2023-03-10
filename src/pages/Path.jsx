@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import Node from '../components/Node'
 import classes from './Path.module.css'
 import { motion } from 'framer-motion'
-import { dijkstra } from '../algorithms/Dijkstra'
+import { dijkstra, getShortestPathOrder } from '../algorithms/Dijkstra'
 
 const Path = () => {
 	const [pathes, setPathes] = useState([])
@@ -96,6 +96,9 @@ const Path = () => {
 					isStart: false,
 					isFinish: false,
 					isWall: false,
+					distance: Infinity,
+					isVisited: false,
+					previousNode: null,
 				}
 				currentRow.push(currentNode)
 			}
@@ -107,7 +110,12 @@ const Path = () => {
 		setPaintWallBtn(false)
 	}
 	const handleRunDijkstraBtn = () => {
-		console.log(dijkstra(pathes, startNode, endNode))
+		// const path = getShortestPathOrder(
+		// 	dijkstra(pathes, startNode, endNode).pop()
+		// )
+		console.log(pathes)
+		const test = dijkstra(pathes, startNode, endNode)
+		console.log(test)
 	}
 	return (
 		<>

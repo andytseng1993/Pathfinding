@@ -1,24 +1,27 @@
 // startNode , endNode = [row,col]
 export const dijkstra = (pathes, startNode, endNode) => {
 	if (startNode.length === 0 || startNode.length === 0) return
-	const visitedNodesInOrder = []
-	// const unvistedNode = getGraph(pathes)
-	const unvistedNode = []
-	unvistedNode.push(pathes[startNode[0]][startNode[1]])
-	while (unvistedNode.length > 0) {
-		unvistedNode.sort((a, b) => a.distance - b.distance)
-		const currentNode = unvistedNode.shift()
+	let visitedNodesInOrder = []
+	// deep copy the pathes to prevent useState value changing
+	const nodes = JSON.parse(JSON.stringify(pathes))
+	// const unvisitedNode = getGraph(pathes)
+	let unvisitedNode = []
+	unvisitedNode.push(nodes[startNode[0]][startNode[1]])
+	console.log(unvisitedNode)
+	while (unvisitedNode.length > 0) {
+		unvisitedNode.sort((a, b) => a.distance - b.distance)
+		const currentNode = unvisitedNode.shift()
 		if (currentNode.isWall) continue
 		if (currentNode.isVisited) continue
 		currentNode.isVisited = true
 		visitedNodesInOrder.push(currentNode)
 		if (currentNode.row === endNode[0] && currentNode.col === endNode[1])
 			return visitedNodesInOrder
-		const currentNodeNeighbors = getNeighbors(pathes, currentNode)
+		const currentNodeNeighbors = getNeighbors(nodes, currentNode)
 		for (let neighbor of currentNodeNeighbors) {
 			neighbor.distance = currentNode.distance + 1
 			neighbor.previousNode = currentNode
-			unvistedNode.push(neighbor)
+			unvisitedNode.push(neighbor)
 		}
 	}
 }
@@ -45,4 +48,14 @@ const getNeighbors = (pathes, currentNode) => {
 	// to top
 	if (row > 0) neighbors.push(pathes[row - 1][col])
 	return neighbors.filter((neighbor) => !neighbor.isVisited)
+}
+
+export function getShortestPathOrder(finishNode) {
+	const shortestPathOrder = []
+	let currentNode = finishNode
+	while (currentNode !== null) {
+		shortestPathOrder.unshift(currentNode)
+		currentNode = currentNode.previousNode
+	}
+	return shortestPathOrder
 }
