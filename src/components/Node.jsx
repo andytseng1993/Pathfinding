@@ -40,7 +40,7 @@ const Node = ({
 		setPaintWall(false)
 	}
 
-	return path.map((col, index) => (
+	return path.map((node, index) => (
 		<motion.div
 			initial={{ opacity: 0 }}
 			animate={{
@@ -62,17 +62,21 @@ const Node = ({
 			}}
 			key={index}
 			className={`${classes.node} ${
-				col.isStart
+				node.isStart
 					? classes.start
-					: col.isFinish
+					: node.isFinish
 					? classes.finish
-					: col.isWall
+					: node.isWall
 					? classes.wall
+					: node.isShortPath
+					? classes.shortPath
+					: node.isAnimated
+					? classes.animate
 					: ''
 			}`}
-			onClick={() => handleClick(col.row, col.col)}
+			onClick={() => handleClick(node.row, node.col)}
 			onMouseDown={handlePaintWallStart}
-			onMouseMove={() => handleMove(col.row, col.col, col.isWall)}
+			onMouseMove={() => handleMove(node.row, node.col, node.isWall)}
 			onMouseUp={handlePaintWallEnd}
 		></motion.div>
 	))

@@ -27,6 +27,8 @@ const Path = () => {
 					distance: Infinity,
 					isVisited: false,
 					previousNode: null,
+					isAnimated: false,
+					isShortPath: false,
 				}
 				currentRow.push(currentNode)
 			}
@@ -99,6 +101,8 @@ const Path = () => {
 					distance: Infinity,
 					isVisited: false,
 					previousNode: null,
+					isAnimated: false,
+					isShortPath: false,
 				}
 				currentRow.push(currentNode)
 			}
@@ -110,12 +114,42 @@ const Path = () => {
 		setPaintWallBtn(false)
 	}
 	const handleRunDijkstraBtn = () => {
-		// const path = getShortestPathOrder(
-		// 	dijkstra(pathes, startNode, endNode).pop()
-		// )
-		console.log(pathes)
-		const test = dijkstra(pathes, startNode, endNode)
-		console.log(test)
+		const visitedNodesInOrder = dijkstra(pathes, startNode, endNode)
+		const shortestPathOrder = getShortestPathOrder(visitedNodesInOrder.pop())
+		nodeAnimation(visitedNodesInOrder, shortestPathOrder)
+	}
+	const nodeAnimation = (nodesPath, shortestPathOrder) => {
+		for (let i = 0; i <= nodesPath.length; i++) {
+			if (i !== nodesPath.length) {
+				setTimeAnimate(i, nodesPath, true, false, 10)
+			} else {
+				setTimeout(() => {
+					for (let n = 0; n < shortestPathOrder.length; n++) {
+						setTimeAnimate(n, shortestPathOrder, true, true, 50)
+					}
+				}, 10 * i)
+			}
+		}
+	}
+	const setTimeAnimate = (
+		i,
+		nodes,
+		isAnimated = false,
+		isShortPath = false,
+		time
+	) => {
+		setTimeout(() => {
+			const node = nodes[i]
+			setPathes((pre) => {
+				return pre.map((row) => {
+					return row.map((cell) =>
+						cell.row === node.row && cell.col === node.col
+							? { ...cell, isAnimated, isShortPath }
+							: cell
+					)
+				})
+			})
+		}, time * i)
 	}
 	return (
 		<>
