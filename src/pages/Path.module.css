@@ -1,4 +1,49 @@
-.row{
+.row {
   display: flex;
   margin: 0 auto;
+}
+
+.nav {
+  margin-bottom: 20px;
+  display: flex;
+}
+
+.btn {
+  font-size: 20px;
+  padding: 7px 15px;
+  margin-right: 5px;
+  border-radius: 5px;
+  border: 1px solid rgb(116, 116, 116);
+  background-color: white;
+  transition: background-color 0.4s;
+}
+
+.nodes {
+  display: block;
+  width: 1700px;
+  margin: 5px auto;
+}
+
+.btnActived {
+  background-color: rgb(216, 216, 216);
+}
+
+.warning {
+  color: rgb(225, 1, 1);
+  background-color: rgb(255, 235, 235);
+  padding: 5px 15px;
+  border-radius: 5px;
+  font-size: 20px;
+  margin-left: 10px;
+  align-self: center;
+  transition: 0.1s;
+}
+
+.pathNum {
+  font-size: 20px;
+  align-self: center;
+  border-radius: 5px;
+  padding: 5px 15px;
+  margin-left: 10px;
+  background-color: rgba(229, 229, 229, 0.703);
 }

@@ -12,6 +12,10 @@ const Path = () => {
 	const [startNode, setStartNode] = useState([])
 	const [endBtn, setEndBtn] = useState(false)
 	const [endNode, setEndNode] = useState([])
+	const [warning, setWarning] = useState('')
+	const [beforeRunNode, setBeforeRunNode] = useState([])
+	const [afterRun, setAfterRun] = useState(false)
+	const [pathNum, setPathNum] = useState(0)
 
 	useEffect(() => {
 		let nodes = []
@@ -43,8 +47,7 @@ const Path = () => {
 		isFinish = false,
 		isWall = false
 	) => {
-		let newPathes = [...pathes]
-
+		let newPathes = JSON.parse(JSON.stringify(pathes))
 		if (isStart) {
 			if (startNode.length > 0) {
 				newPathes[startNode[0]][startNode[1]].isStart = false
@@ -65,9 +68,15 @@ const Path = () => {
 		if (isFinish) setEndNode([row, col])
 		setStartBtn(false)
 		setEndBtn(false)
+		setWarning('')
 	}
 
 	const handleSetBtn = (string) => {
+		if (afterRun) {
+			setPathes(JSON.parse(JSON.stringify(beforeRunNode)))
+			setAfterRun(false)
+			setPathNum(0)
+		}
 		if (string === 'start') {
 			setStartBtn(!startBtn)
 			setEndBtn(false)
@@ -83,6 +92,7 @@ const Path = () => {
 			setEndBtn(false)
 			setPaintWallBtn(!paintWallBtn)
 		}
+		setWarning('')
 	}
 	const handleStopPainting = () => {
 		setPaintWall(false)
@@ -112,20 +122,59 @@ const Path = () => {
 		setStartBtn(false)
 		setEndBtn(false)
 		setPaintWallBtn(false)
+		setStartNode([])
+		setEndNode([])
+		setWarning('')
+		setBeforeRunNode([])
+		setAfterRun(false)
+		setPathNum(0)
 	}
 	const handleRunDijkstraBtn = () => {
+		if (afterRun) {
+			setPathes(() => JSON.parse(JSON.stringify(beforeRunNode)))
+			setAfterRun(false)
+			setPathNum(0)
+		} else {
+			setBeforeRunNode(() => JSON.parse(JSON.stringify(pathes)))
+		}
+		setWarning('')
+		setStartBtn(false)
+		setEndBtn(false)
+		setPaintWallBtn(false)
 		const visitedNodesInOrder = dijkstra(pathes, startNode, endNode)
-		const shortestPathOrder = getShortestPathOrder(visitedNodesInOrder.pop())
-		nodeAnimation(visitedNodesInOrder, shortestPathOrder)
+		// if dones not set start or end node
+		if (typeof visitedNodesInOrder === 'string') {
+			return setWarning(visitedNodesInOrder)
+		}
+		// if cannot find the end node
+		if (typeof visitedNodesInOrder.warning === 'string') {
+			for (let i = 0; i <= visitedNodesInOrder.visitedPath.length; i++) {
+				if (i !== visitedNodesInOrder.visitedPath.length) {
+					setTimeAnimate(i, visitedNodesInOrder.visitedPath, true, false, 10)
+				} else {
+					setTimeout(() => {
+						setWarning(visitedNodesInOrder.warning)
+					}, 10 * i)
+				}
+			}
+		} else {
+			const shortestPathOrder = getShortestPathOrder(visitedNodesInOrder.pop())
+			nodeAnimation(visitedNodesInOrder, shortestPathOrder)
+		}
+		setAfterRun(true)
 	}
 	const nodeAnimation = (nodesPath, shortestPathOrder) => {
 		for (let i = 0; i <= nodesPath.length; i++) {
 			if (i !== nodesPath.length) {
 				setTimeAnimate(i, nodesPath, true, false, 10)
 			} else {
+				//shortest path
 				setTimeout(() => {
 					for (let n = 0; n < shortestPathOrder.length; n++) {
 						setTimeAnimate(n, shortestPathOrder, true, true, 50)
+						setTimeout(() => {
+							setPathNum((pre) => pre + 1)
+						}, 50 * n)
 					}
 				}, 10 * i)
 			}
@@ -154,28 +203,43 @@ const Path = () => {
 	return (
 		<>
 			<h1 style={{ marginBottom: '10px' }}>Path Finding</h1>
-			<div style={{ marginBottom: '20px' }}>
-				<button onClick={() => handleSetBtn('start')}>
+			<div className={classes.nav}>
+				<button
+					className={`${classes.btn} ${startBtn ? classes.btnActived : ''}`}
+					onClick={() => handleSetBtn('start')}
+				>
 					{startBtn ? 'Setting start node' : 'Set start node'}
 				</button>
-				<button onClick={() => handleSetBtn('end')}>
+				<button
+					className={`${classes.btn} ${endBtn ? classes.btnActived : ''}`}
+					onClick={() => handleSetBtn('end')}
+				>
 					{endBtn ? 'Setting end node' : 'Set end node'}
 				</button>
-				<button onClick={() => handleSetBtn('wall')}>
+				<button
+					className={`${classes.btn} ${paintWallBtn ? classes.btnActived : ''}`}
+					onClick={() => handleSetBtn('wall')}
+				>
 					{paintWallBtn ? 'Painting wall..' : 'Paint wall'}
 				</button>
-				<button onClick={handleClear}>Clear</button>
-				<button onClick={handleRunDijkstraBtn}>Run dijkstra</button>
+				<button className={classes.btn} onClick={handleClear}>
+					Clear
+				</button>
+				<button className={classes.btn} onClick={handleRunDijkstraBtn}>
+					Run dijkstra
+				</button>
+				<div className={warning ? classes.warning : ''}>
+					{warning ? warning : null}
+				</div>
+				<div className={pathNum ? classes.pathNum : ''}>
+					{pathNum ? (
+						<>
+							Path number : <strong>{pathNum}</strong>
+						</>
+					) : null}
+				</div>
 			</div>
-			<div
-				style={{
-					display: 'block',
-					width: '1700px',
-					marginLeft: 'auto',
-					marginRight: 'auto',
-				}}
-				onMouseLeave={handleStopPainting}
-			>
+			<div className={classes.nodes} onMouseLeave={handleStopPainting}>
 				{pathes.map((path, index) => (
 					<motion.div
 						key={index}

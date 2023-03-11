@@ -1,15 +1,14 @@
 // startNode , endNode = [row,col]
 export const dijkstra = (pathes, startNode, endNode) => {
-	if (startNode.length === 0 || startNode.length === 0) return
+	if (startNode.length === 0) return 'Please set start node !'
+	if (endNode.length === 0) return 'Please set end node !'
 	let visitedNodesInOrder = []
 	// deep copy the pathes to prevent useState value changing
 	const nodes = JSON.parse(JSON.stringify(pathes))
-	// const unvisitedNode = getGraph(pathes)
 	let unvisitedNode = []
+	//start point
 	unvisitedNode.push(nodes[startNode[0]][startNode[1]])
-	console.log(unvisitedNode)
 	while (unvisitedNode.length > 0) {
-		unvisitedNode.sort((a, b) => a.distance - b.distance)
 		const currentNode = unvisitedNode.shift()
 		if (currentNode.isWall) continue
 		if (currentNode.isVisited) continue
@@ -24,16 +23,12 @@ export const dijkstra = (pathes, startNode, endNode) => {
 			unvisitedNode.push(neighbor)
 		}
 	}
-}
-
-const getGraph = (nodes) => {
-	const graph = []
-	for (let row of nodes) {
-		for (let node of row) {
-			graph.push(node)
+	if (unvisitedNode.length === 0) {
+		return {
+			warning: 'Cannot find the finish node!',
+			visitedPath: visitedNodesInOrder,
 		}
 	}
-	return graph
 }
 
 const getNeighbors = (pathes, currentNode) => {
