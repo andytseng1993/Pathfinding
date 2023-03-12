@@ -11,6 +11,7 @@ const Node = ({
 	endBtn,
 }) => {
 	const handleClick = (row, col) => {
+		if (!startBtn && !endBtn && !paintWallBtn) return
 		let isStart = false
 		let isFinish = false
 		let isWall = false

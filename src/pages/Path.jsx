@@ -3,6 +3,7 @@ import Node from '../components/Node'
 import classes from './Path.module.css'
 import { motion } from 'framer-motion'
 import { dijkstra, getShortestPathOrder } from '../algorithms/Dijkstra'
+import { primAlgorithm } from '../mazeAlgorithms/PrimMaze'
 
 const Path = () => {
 	const [pathes, setPathes] = useState([])
@@ -16,12 +17,13 @@ const Path = () => {
 	const [beforeRunNode, setBeforeRunNode] = useState([])
 	const [afterRun, setAfterRun] = useState(false)
 	const [pathNum, setPathNum] = useState(0)
+	const [isLoading, setIsLoading] = useState(false)
 
 	useEffect(() => {
 		let nodes = []
 		for (let row = 0; row < 15; row++) {
 			let currentRow = []
-			for (let col = 0; col < 50; col++) {
+			for (let col = 0; col < 49; col++) {
 				const currentNode = {
 					row,
 					col,
@@ -33,6 +35,7 @@ const Path = () => {
 					previousNode: null,
 					isAnimated: false,
 					isShortPath: false,
+					isMazeVisited: false,
 				}
 				currentRow.push(currentNode)
 			}
@@ -53,12 +56,14 @@ const Path = () => {
 				newPathes[startNode[0]][startNode[1]].isStart = false
 				newPathes[startNode[0]][startNode[1]].distance = Infinity
 			}
+			newPathes[row][col].isWall = false
 			newPathes[row][col].isStart = true
 			newPathes[row][col].distance = 0
 		}
 		if (isFinish) {
 			if (endNode.length > 0) newPathes[endNode[0]][endNode[1]].isFinish = false
 			newPathes[row][col].isFinish = true
+			newPathes[row][col].isWall = false
 		}
 		if (isWall) {
 			newPathes[row][col].isWall = !newPathes[row][col].isWall
@@ -101,7 +106,7 @@ const Path = () => {
 		let nodes = []
 		for (let row = 0; row < 15; row++) {
 			let currentRow = []
-			for (let col = 0; col < 50; col++) {
+			for (let col = 0; col < 49; col++) {
 				const currentNode = {
 					row,
 					col,
@@ -113,6 +118,7 @@ const Path = () => {
 					previousNode: null,
 					isAnimated: false,
 					isShortPath: false,
+					isMazeVisited: false,
 				}
 				currentRow.push(currentNode)
 			}
@@ -200,43 +206,136 @@ const Path = () => {
 			})
 		}, time * i)
 	}
+	const handleMazeGeneratorBtn = () => {
+		setIsLoading(true)
+		let nodes = []
+		for (let row = 0; row < 15; row++) {
+			let currentRow = []
+			for (let col = 0; col < 49; col++) {
+				const currentNode = {
+					row,
+					col,
+					isStart: false,
+					isFinish: false,
+					isWall: true,
+					distance: Infinity,
+					isVisited: false,
+					previousNode: null,
+					isAnimated: false,
+					isShortPath: false,
+					isMazeVisited: false,
+				}
+				currentRow.push(currentNode)
+			}
+			nodes.push(currentRow)
+		}
+		setStartBtn(false)
+		setEndBtn(false)
+		setPaintWallBtn(false)
+		setStartNode([])
+		setEndNode([])
+		setWarning('')
+		setBeforeRunNode([])
+		setAfterRun(false)
+		setPathNum(0)
+		setPathes(nodes)
+		const maze = primAlgorithm(nodes)
+
+		for (let i = 0; i <= maze.length; i++) {
+			if (i === maze.length) {
+				setTimeout(() => {
+					const randomStart = maze.splice(
+						Math.floor(Math.random() * maze.length),
+						1
+					)[0]
+					randomStart.isStart = true
+					const randomEnd = maze.splice(
+						Math.floor(Math.random() * maze.length),
+						1
+					)[0]
+					randomEnd.isFinish = true
+					setPathes((pre) => {
+						return pre.map((row) => {
+							return row.map(
+								(cell) =>
+									(cell.row === randomStart.row && cell.col === randomStart.col
+										? randomStart
+										: cell) ||
+									(cell.row === randomEnd.row && cell.col === randomEnd.col
+										? randomEnd
+										: cell)
+							)
+						})
+					})
+					setStartNode([randomStart.row, randomStart.col])
+					setEndNode([randomEnd.row, randomEnd.col])
+					setIsLoading(false)
+				}, 25 * i)
+			} else {
+				const node = maze[i]
+				setTimeout(() => {
+					setPathes((pre) => {
+						return pre.map((row) => {
+							return row.map((cell) =>
+								cell.row === node.row && cell.col === node.col ? node : cell
+							)
+						})
+					})
+				}, 25 * i)
+			}
+		}
+	}
+
 	return (
 		<>
 			<h1 style={{ marginBottom: '10px' }}>Path Finding</h1>
-			<div className={classes.nav}>
-				<button
-					className={`${classes.btn} ${startBtn ? classes.btnActived : ''}`}
-					onClick={() => handleSetBtn('start')}
-				>
-					{startBtn ? 'Setting start node' : 'Set start node'}
-				</button>
-				<button
-					className={`${classes.btn} ${endBtn ? classes.btnActived : ''}`}
-					onClick={() => handleSetBtn('end')}
-				>
-					{endBtn ? 'Setting end node' : 'Set end node'}
-				</button>
-				<button
-					className={`${classes.btn} ${paintWallBtn ? classes.btnActived : ''}`}
-					onClick={() => handleSetBtn('wall')}
-				>
-					{paintWallBtn ? 'Painting wall..' : 'Paint wall'}
-				</button>
-				<button className={classes.btn} onClick={handleClear}>
-					Clear
-				</button>
-				<button className={classes.btn} onClick={handleRunDijkstraBtn}>
-					Run dijkstra
-				</button>
-				<div className={warning ? classes.warning : ''}>
-					{warning ? warning : null}
+			<div className={classes.navBar}>
+				<div className={classes.nav}>
+					<button
+						className={`${classes.btn} ${startBtn ? classes.btnActived : ''}`}
+						onClick={() => handleSetBtn('start')}
+					>
+						{startBtn ? 'Setting start node' : 'Set start node'}
+					</button>
+					<button
+						className={`${classes.btn} ${endBtn ? classes.btnActived : ''}`}
+						onClick={() => handleSetBtn('end')}
+					>
+						{endBtn ? 'Setting end node' : 'Set end node'}
+					</button>
+					<button
+						className={`${classes.btn} ${
+							paintWallBtn ? classes.btnActived : ''
+						}`}
+						onClick={() => handleSetBtn('wall')}
+					>
+						{paintWallBtn ? 'Painting wall..' : 'Paint wall'}
+					</button>
+					<button className={classes.btn} onClick={() => handleClear(false)}>
+						Clear
+					</button>
+					<button className={classes.btn} onClick={handleRunDijkstraBtn}>
+						Run dijkstra
+					</button>
+					<div className={warning ? classes.warning : ''}>
+						{warning ? warning : null}
+					</div>
+					<div className={pathNum ? classes.pathNum : ''}>
+						{pathNum ? (
+							<>
+								Path number : <strong>{pathNum}</strong>
+							</>
+						) : null}
+					</div>
 				</div>
-				<div className={pathNum ? classes.pathNum : ''}>
-					{pathNum ? (
-						<>
-							Path number : <strong>{pathNum}</strong>
-						</>
-					) : null}
+				<div className={classes.nav}>
+					<button
+						className={classes.btn}
+						onClick={handleMazeGeneratorBtn}
+						disabled={isLoading}
+					>
+						{isLoading ? 'Generating...' : 'Maze generator'}
+					</button>
 				</div>
 			</div>
 			<div className={classes.nodes} onMouseLeave={handleStopPainting}>
