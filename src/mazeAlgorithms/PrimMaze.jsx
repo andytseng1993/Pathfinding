@@ -6,9 +6,8 @@ export const primAlgorithm = (pathes) => {
 	if (colRandom % 2 === 1) colRandom += 1
 	const start = nodes[rowRandom][colRandom]
 	const frontier = []
-	console.log(start)
 	frontier.push(start)
-	const visitedStack = []
+	const visited = []
 	while (frontier.length > 0) {
 		const currentNode = frontier.splice(
 			Math.floor(Math.random() * frontier.length),
@@ -17,7 +16,7 @@ export const primAlgorithm = (pathes) => {
 		if (currentNode.isMazeVisited) continue
 		currentNode.isWall = false
 		currentNode.isMazeVisited = true
-		visitedStack.push(currentNode)
+		visited.push(currentNode)
 		const currentNodeNeighbors = getNeighbors(nodes, currentNode)
 		if (currentNodeNeighbors.isVisited.length > 0) {
 			const visitedNode =
@@ -30,11 +29,11 @@ export const primAlgorithm = (pathes) => {
 				]
 			middleNode.isWall = false
 			middleNode.isMazeVisited = true
-			visitedStack.push(middleNode)
+			visited.push(middleNode)
 		}
 		frontier.push(...currentNodeNeighbors.unVisited)
 	}
-	return visitedStack
+	return visited
 }
 const getNeighbors = (pathes, currentNode) => {
 	const neighbors = []
