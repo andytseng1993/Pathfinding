@@ -4,6 +4,7 @@ import classes from './Path.module.css'
 import { motion } from 'framer-motion'
 import { dijkstra, getShortestPathOrder } from '../algorithms/Dijkstra'
 import { primAlgorithm } from '../mazeAlgorithms/PrimMaze'
+import { AStar } from '../algorithms/AStar'
 
 const Path = () => {
 	const [pathes, setPathes] = useState([])
@@ -24,25 +25,30 @@ const Path = () => {
 		for (let row = 0; row < 15; row++) {
 			let currentRow = []
 			for (let col = 0; col < 49; col++) {
-				const currentNode = {
-					row,
-					col,
-					isStart: false,
-					isFinish: false,
-					isWall: false,
-					distance: Infinity,
-					isVisited: false,
-					previousNode: null,
-					isAnimated: false,
-					isShortPath: false,
-					isMazeVisited: false,
-				}
-				currentRow.push(currentNode)
+				currentRow.push(currentNode(row, col))
 			}
 			nodes.push(currentRow)
 		}
 		setPathes(nodes)
 	}, [])
+
+	const currentNode = (row, col) => {
+		return {
+			row,
+			col,
+			isStart: false,
+			isFinish: false,
+			isWall: false,
+			gScore: Infinity,
+			distance: Infinity,
+			isVisited: false,
+			previousNode: null,
+			isAnimated: false,
+			isShortPath: false,
+			isMazeVisited: false,
+		}
+	}
+
 	const handleChangeNode = (
 		row,
 		col,
@@ -59,6 +65,7 @@ const Path = () => {
 			newPathes[row][col].isWall = false
 			newPathes[row][col].isStart = true
 			newPathes[row][col].distance = 0
+			newPathes[row][col].gScore = 0
 		}
 		if (isFinish) {
 			if (endNode.length > 0) newPathes[endNode[0]][endNode[1]].isFinish = false
@@ -107,20 +114,7 @@ const Path = () => {
 		for (let row = 0; row < 15; row++) {
 			let currentRow = []
 			for (let col = 0; col < 49; col++) {
-				const currentNode = {
-					row,
-					col,
-					isStart: false,
-					isFinish: false,
-					isWall: false,
-					distance: Infinity,
-					isVisited: false,
-					previousNode: null,
-					isAnimated: false,
-					isShortPath: false,
-					isMazeVisited: false,
-				}
-				currentRow.push(currentNode)
+				currentRow.push(currentNode(row, col))
 			}
 			nodes.push(currentRow)
 		}
@@ -212,20 +206,7 @@ const Path = () => {
 		for (let row = 0; row < 15; row++) {
 			let currentRow = []
 			for (let col = 0; col < 49; col++) {
-				const currentNode = {
-					row,
-					col,
-					isStart: false,
-					isFinish: false,
-					isWall: true,
-					distance: Infinity,
-					isVisited: false,
-					previousNode: null,
-					isAnimated: false,
-					isShortPath: false,
-					isMazeVisited: false,
-				}
-				currentRow.push(currentNode)
+				currentRow.push(currentNode(row, col))
 			}
 			nodes.push(currentRow)
 		}
@@ -286,6 +267,22 @@ const Path = () => {
 		}
 	}
 
+	const handleRunAStarBtn = () => {
+		if (afterRun) {
+			setPathes(() => JSON.parse(JSON.stringify(beforeRunNode)))
+			setAfterRun(false)
+			setPathNum(0)
+		} else {
+			setBeforeRunNode(() => JSON.parse(JSON.stringify(pathes)))
+		}
+		setWarning('')
+		setStartBtn(false)
+		setEndBtn(false)
+		setPaintWallBtn(false)
+		const visitedNodesInOrder = AStar(pathes, startNode, endNode)
+		console.log(visitedNodesInOrder)
+	}
+
 	return (
 		<>
 			<h1 style={{ marginBottom: '10px' }}>Path Finding</h1>
@@ -315,7 +312,10 @@ const Path = () => {
 						Clear
 					</button>
 					<button className={classes.btn} onClick={handleRunDijkstraBtn}>
-						Run dijkstra
+						Run dijkstra Algorithm
+					</button>
+					<button className={classes.btn} onClick={handleRunAStarBtn}>
+						Run A* Algorithm
 					</button>
 					<div className={warning ? classes.warning : ''}>
 						{warning ? warning : null}

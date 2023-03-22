@@ -21,7 +21,17 @@
   border: 1px solid rgb(116, 116, 116);
   background-color: white;
   transition: background-color 0.4s;
+  cursor: pointer;
 }
+
+.btn:hover {
+  background-color: rgb(225, 225, 225);
+}
+
+.btn:active {
+  transform: translate(0px, 1px);
+}
+
 
 .nodes {
   display: block;
@@ -32,7 +42,7 @@
 }
 
 .btnActived {
-  background-color: rgb(216, 216, 216);
+  background-color: rgb(206, 206, 206);
 }
 
 .warning {
