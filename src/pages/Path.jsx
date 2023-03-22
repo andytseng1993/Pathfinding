@@ -4,7 +4,7 @@ import classes from './Path.module.css'
 import { motion } from 'framer-motion'
 import { dijkstra, getShortestPathOrder } from '../algorithms/Dijkstra'
 import { primAlgorithm } from '../mazeAlgorithms/PrimMaze'
-import { AStar } from '../algorithms/AStar'
+import { aStar } from '../algorithms/AStar'
 
 const Path = () => {
 	const [pathes, setPathes] = useState([])
@@ -32,13 +32,13 @@ const Path = () => {
 		setPathes(nodes)
 	}, [])
 
-	const currentNode = (row, col) => {
+	const currentNode = (row, col, isWall = false) => {
 		return {
 			row,
 			col,
 			isStart: false,
 			isFinish: false,
-			isWall: false,
+			isWall,
 			gScore: Infinity,
 			distance: Infinity,
 			isVisited: false,
@@ -48,7 +48,17 @@ const Path = () => {
 			isMazeVisited: false,
 		}
 	}
-
+	const setToDefault = () => {
+		setStartBtn(false)
+		setEndBtn(false)
+		setPaintWallBtn(false)
+		setStartNode([])
+		setEndNode([])
+		setWarning('')
+		setBeforeRunNode([])
+		setAfterRun(false)
+		setPathNum(0)
+	}
 	const handleChangeNode = (
 		row,
 		col,
@@ -119,17 +129,9 @@ const Path = () => {
 			nodes.push(currentRow)
 		}
 		setPathes(nodes)
-		setStartBtn(false)
-		setEndBtn(false)
-		setPaintWallBtn(false)
-		setStartNode([])
-		setEndNode([])
-		setWarning('')
-		setBeforeRunNode([])
-		setAfterRun(false)
-		setPathNum(0)
+		setToDefault()
 	}
-	const handleRunDijkstraBtn = () => {
+	const handleRunDijkstraBtn = (algorithm) => {
 		if (afterRun) {
 			setPathes(() => JSON.parse(JSON.stringify(beforeRunNode)))
 			setAfterRun(false)
@@ -141,7 +143,14 @@ const Path = () => {
 		setStartBtn(false)
 		setEndBtn(false)
 		setPaintWallBtn(false)
-		const visitedNodesInOrder = dijkstra(pathes, startNode, endNode)
+		let visitedNodesInOrder
+		if (algorithm === 'Dijkstra') {
+			visitedNodesInOrder = dijkstra(pathes, startNode, endNode)
+		}
+		if (algorithm === 'AStar') {
+			visitedNodesInOrder = aStar(pathes, startNode, endNode)
+		}
+		setAfterRun(true)
 		// if dones not set start or end node
 		if (typeof visitedNodesInOrder === 'string') {
 			return setWarning(visitedNodesInOrder)
@@ -161,7 +170,6 @@ const Path = () => {
 			const shortestPathOrder = getShortestPathOrder(visitedNodesInOrder.pop())
 			nodeAnimation(visitedNodesInOrder, shortestPathOrder)
 		}
-		setAfterRun(true)
 	}
 	const nodeAnimation = (nodesPath, shortestPathOrder) => {
 		for (let i = 0; i <= nodesPath.length; i++) {
@@ -206,20 +214,12 @@ const Path = () => {
 		for (let row = 0; row < 15; row++) {
 			let currentRow = []
 			for (let col = 0; col < 49; col++) {
-				currentRow.push(currentNode(row, col))
+				currentRow.push(currentNode(row, col, true))
 			}
 			nodes.push(currentRow)
 		}
-		setStartBtn(false)
-		setEndBtn(false)
-		setPaintWallBtn(false)
-		setStartNode([])
-		setEndNode([])
-		setWarning('')
-		setBeforeRunNode([])
-		setAfterRun(false)
-		setPathNum(0)
 		setPathes(nodes)
+		setToDefault()
 		const maze = primAlgorithm(nodes)
 
 		for (let i = 0; i <= maze.length; i++) {
@@ -267,22 +267,6 @@ const Path = () => {
 		}
 	}
 
-	const handleRunAStarBtn = () => {
-		if (afterRun) {
-			setPathes(() => JSON.parse(JSON.stringify(beforeRunNode)))
-			setAfterRun(false)
-			setPathNum(0)
-		} else {
-			setBeforeRunNode(() => JSON.parse(JSON.stringify(pathes)))
-		}
-		setWarning('')
-		setStartBtn(false)
-		setEndBtn(false)
-		setPaintWallBtn(false)
-		const visitedNodesInOrder = AStar(pathes, startNode, endNode)
-		console.log(visitedNodesInOrder)
-	}
-
 	return (
 		<>
 			<h1 style={{ marginBottom: '10px' }}>Path Finding</h1>
@@ -311,10 +295,16 @@ const Path = () => {
 					<button className={classes.btn} onClick={() => handleClear(false)}>
 						Clear
 					</button>
-					<button className={classes.btn} onClick={handleRunDijkstraBtn}>
+					<button
+						className={classes.btn}
+						onClick={() => handleRunDijkstraBtn('Dijkstra')}
+					>
 						Run dijkstra Algorithm
 					</button>
-					<button className={classes.btn} onClick={handleRunAStarBtn}>
+					<button
+						className={classes.btn}
+						onClick={() => handleRunDijkstraBtn('AStar')}
+					>
 						Run A* Algorithm
 					</button>
 					<div className={warning ? classes.warning : ''}>
