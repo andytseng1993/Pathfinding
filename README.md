@@ -10,6 +10,10 @@
     Repeat steps 4 through 7 until there are no more unvisitedNode cells or touch the end point.
     If no more unvisitedNode, it mean cannot find finish node. Return visitedNodesInOrder.
 
+# Depth First Search
+
+Almost the same as Dijkstra algorithm, using the Stack (LIFO).
+
 # A\* algorithm
 
 Almost the same as Dijkstra algorithm, and one important aspect of A\* is f = g + h.

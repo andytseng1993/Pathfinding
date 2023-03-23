@@ -6,6 +6,7 @@ import { dijkstra, getShortestPathOrder } from '../algorithms/Dijkstra'
 import { primAlgorithm } from '../mazeAlgorithms/PrimMaze'
 import { aStar } from '../algorithms/AStar'
 import { useWindowDimensions } from '../components/useWindowDimensions'
+import { depthFirstSearch } from '../algorithms/DepthFirstSearch'
 
 const rowNode = 25
 const colNode = 69
@@ -21,7 +22,7 @@ const Path = () => {
 	const [warning, setWarning] = useState('')
 	const [beforeRunNode, setBeforeRunNode] = useState([])
 	const [afterRun, setAfterRun] = useState(false)
-	const [pathNum, setPathNum] = useState(0)
+	const [pathNum, setPathNum] = useState(-1)
 	const [isLoading, setIsLoading] = useState(false)
 	const width = useWindowDimensions()
 	const [widthNode, setWidthNode] = useState((width - 72) / colNode - 3)
@@ -67,7 +68,7 @@ const Path = () => {
 		setWarning('')
 		setBeforeRunNode([])
 		setAfterRun(false)
-		setPathNum(0)
+		setPathNum(-1)
 	}
 	const handleChangeNode = (
 		row,
@@ -107,7 +108,7 @@ const Path = () => {
 		if (afterRun) {
 			setPathes(JSON.parse(JSON.stringify(beforeRunNode)))
 			setAfterRun(false)
-			setPathNum(0)
+			setPathNum(-1)
 		}
 		if (string === 'start') {
 			setStartBtn(!startBtn)
@@ -145,7 +146,7 @@ const Path = () => {
 		if (afterRun) {
 			setPathes(() => JSON.parse(JSON.stringify(beforeRunNode)))
 			setAfterRun(false)
-			setPathNum(0)
+			setPathNum(-1)
 		} else {
 			setBeforeRunNode(() => JSON.parse(JSON.stringify(pathes)))
 		}
@@ -159,6 +160,9 @@ const Path = () => {
 		}
 		if (algorithm === 'AStar') {
 			visitedNodesInOrder = aStar(pathes, startNode, endNode)
+		}
+		if (algorithm === 'DepthFirstSearch') {
+			visitedNodesInOrder = depthFirstSearch(pathes, startNode, endNode)
 		}
 		setAfterRun(true)
 		// if dones not set start or end node
@@ -317,11 +321,17 @@ const Path = () => {
 					>
 						Run A* Algorithm
 					</button>
+					<button
+						className={classes.btn}
+						onClick={() => handleRunDijkstraBtn('DepthFirstSearch')}
+					>
+						Run Depth First Search
+					</button>
 					<div className={warning ? classes.warning : ''}>
 						{warning ? warning : null}
 					</div>
-					<div className={pathNum ? classes.pathNum : ''}>
-						{pathNum ? (
+					<div className={pathNum >= 0 ? classes.pathNum : ''}>
+						{pathNum >= 0 ? (
 							<>
 								Path number : <strong>{pathNum}</strong>
 							</>

@@ -1,5 +1,6 @@
-// startNode , endNode = [row,col]
-export const dijkstra = (pathes, startNode, endNode) => {
+import { getNeighbors } from './Dijkstra'
+
+export const depthFirstSearch = (pathes, startNode, endNode) => {
 	if (startNode.length === 0) return 'Please set start node !'
 	if (endNode.length === 0) return 'Please set end node !'
 	let visitedNodesInOrder = []
@@ -9,7 +10,7 @@ export const dijkstra = (pathes, startNode, endNode) => {
 	//start point
 	unvisitedNode.push(nodes[startNode[0]][startNode[1]])
 	while (unvisitedNode.length > 0) {
-		const currentNode = unvisitedNode.shift()
+		const currentNode = unvisitedNode.pop()
 		if (currentNode.isWall) continue
 		if (currentNode.isVisited) continue
 		currentNode.isVisited = true
@@ -29,28 +30,4 @@ export const dijkstra = (pathes, startNode, endNode) => {
 			visitedPath: visitedNodesInOrder,
 		}
 	}
-}
-
-export const getNeighbors = (pathes, currentNode) => {
-	const neighbors = []
-	const { row, col } = currentNode
-	// to right
-	if (col < pathes[0].length - 1) neighbors.push(pathes[row][col + 1])
-	//to down
-	if (row < pathes.length - 1) neighbors.push(pathes[row + 1][col])
-	// to left
-	if (col > 0) neighbors.push(pathes[row][col - 1])
-	// to top
-	if (row > 0) neighbors.push(pathes[row - 1][col])
-	return neighbors.filter((neighbor) => !neighbor.isVisited && !neighbor.isWall)
-}
-
-export function getShortestPathOrder(finishNode) {
-	const shortestPathOrder = []
-	let currentNode = finishNode
-	while (currentNode !== null) {
-		shortestPathOrder.unshift(currentNode)
-		currentNode = currentNode.previousNode
-	}
-	return shortestPathOrder
 }
