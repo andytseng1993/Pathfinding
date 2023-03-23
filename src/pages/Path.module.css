@@ -36,7 +36,7 @@
 .nodes {
   display: block;
   padding: 1px;
-  width: 1618px;
+  width: auto;
   border: 15px solid rgb(68, 68, 68);
   margin: 5px auto;
 }

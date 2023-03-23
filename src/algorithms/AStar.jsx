@@ -1,3 +1,5 @@
+import { getNeighbors } from './Dijkstra'
+
 export const aStar = (pathes, startNode, endNode) => {
 	if (startNode.length === 0) return 'Please set start node !'
 	if (endNode.length === 0) return 'Please set end node !'
@@ -35,18 +37,4 @@ export const aStar = (pathes, startNode, endNode) => {
 			visitedPath: visitedNodesInOrder,
 		}
 	}
-}
-
-const getNeighbors = (pathes, currentNode) => {
-	const neighbors = []
-	const { row, col } = currentNode
-	// to right
-	if (col < pathes[0].length - 1) neighbors.push(pathes[row][col + 1])
-	//to down
-	if (row < pathes.length - 1) neighbors.push(pathes[row + 1][col])
-	// to left
-	if (col > 0) neighbors.push(pathes[row][col - 1])
-	// to top
-	if (row > 0) neighbors.push(pathes[row - 1][col])
-	return neighbors.filter((neighbor) => !neighbor.isVisited && !neighbor.isWall)
 }

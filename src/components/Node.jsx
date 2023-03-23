@@ -9,6 +9,7 @@ const Node = ({
 	setPaintWall,
 	startBtn,
 	endBtn,
+	widthNode,
 }) => {
 	const handleClick = (row, col) => {
 		if (!startBtn && !endBtn && !paintWallBtn) return
@@ -75,6 +76,7 @@ const Node = ({
 					? classes.animate
 					: ''
 			}`}
+			style={{ width: widthNode, height: widthNode }}
 			onClick={() => handleClick(node.row, node.col)}
 			onMouseDown={handlePaintWallStart}
 			onMouseMove={() => handleMove(node.row, node.col, node.isWall)}

@@ -31,7 +31,7 @@ export const dijkstra = (pathes, startNode, endNode) => {
 	}
 }
 
-const getNeighbors = (pathes, currentNode) => {
+export const getNeighbors = (pathes, currentNode) => {
 	const neighbors = []
 	const { row, col } = currentNode
 	// to right

@@ -1,6 +1,6 @@
 export const primAlgorithm = (pathes) => {
-	let rowRandom = Math.floor(Math.random() * 15)
-	let colRandom = Math.floor(Math.random() * 49)
+	let rowRandom = Math.floor(Math.random() * 25)
+	let colRandom = Math.floor(Math.random() * 69)
 	const nodes = JSON.parse(JSON.stringify(pathes))
 	if (rowRandom % 2 === 1) rowRandom += 1
 	if (colRandom % 2 === 1) colRandom += 1
@@ -16,7 +16,6 @@ export const primAlgorithm = (pathes) => {
 		if (currentNode.isMazeVisited) continue
 		currentNode.isWall = false
 		currentNode.isMazeVisited = true
-		visited.push(currentNode)
 		const currentNodeNeighbors = getNeighbors(nodes, currentNode)
 		if (currentNodeNeighbors.isVisited.length > 0) {
 			const visitedNode =
@@ -31,6 +30,7 @@ export const primAlgorithm = (pathes) => {
 			middleNode.isMazeVisited = true
 			visited.push(middleNode)
 		}
+		visited.push(currentNode)
 		frontier.push(...currentNodeNeighbors.unVisited)
 	}
 	return visited

@@ -5,6 +5,10 @@ import { motion } from 'framer-motion'
 import { dijkstra, getShortestPathOrder } from '../algorithms/Dijkstra'
 import { primAlgorithm } from '../mazeAlgorithms/PrimMaze'
 import { aStar } from '../algorithms/AStar'
+import { useWindowDimensions } from '../components/useWindowDimensions'
+
+const rowNode = 25
+const colNode = 69
 
 const Path = () => {
 	const [pathes, setPathes] = useState([])
@@ -19,12 +23,18 @@ const Path = () => {
 	const [afterRun, setAfterRun] = useState(false)
 	const [pathNum, setPathNum] = useState(0)
 	const [isLoading, setIsLoading] = useState(false)
+	const width = useWindowDimensions()
+	const [widthNode, setWidthNode] = useState((width - 72) / colNode - 3)
+
+	useEffect(() => {
+		setWidthNode((width - 72) / colNode - 3)
+	}, [width])
 
 	useEffect(() => {
 		let nodes = []
-		for (let row = 0; row < 15; row++) {
+		for (let row = 0; row < rowNode; row++) {
 			let currentRow = []
-			for (let col = 0; col < 49; col++) {
+			for (let col = 0; col < colNode; col++) {
 				currentRow.push(currentNode(row, col))
 			}
 			nodes.push(currentRow)
@@ -121,9 +131,9 @@ const Path = () => {
 	}
 	const handleClear = () => {
 		let nodes = []
-		for (let row = 0; row < 15; row++) {
+		for (let row = 0; row < rowNode; row++) {
 			let currentRow = []
-			for (let col = 0; col < 49; col++) {
+			for (let col = 0; col < colNode; col++) {
 				currentRow.push(currentNode(row, col))
 			}
 			nodes.push(currentRow)
@@ -211,9 +221,9 @@ const Path = () => {
 	const handleMazeGeneratorBtn = () => {
 		setIsLoading(true)
 		let nodes = []
-		for (let row = 0; row < 15; row++) {
+		for (let row = 0; row < rowNode; row++) {
 			let currentRow = []
-			for (let col = 0; col < 49; col++) {
+			for (let col = 0; col < colNode; col++) {
 				currentRow.push(currentNode(row, col, true))
 			}
 			nodes.push(currentRow)
@@ -251,7 +261,7 @@ const Path = () => {
 					setStartNode([randomStart.row, randomStart.col])
 					setEndNode([randomEnd.row, randomEnd.col])
 					setIsLoading(false)
-				}, 25 * i)
+				}, 10 * i)
 			} else {
 				const node = maze[i]
 				setTimeout(() => {
@@ -262,14 +272,14 @@ const Path = () => {
 							)
 						})
 					})
-				}, 25 * i)
+				}, 10 * i)
 			}
 		}
 	}
 
 	return (
 		<>
-			<h1 style={{ marginBottom: '10px' }}>Path Finding</h1>
+			<h1 style={{ marginBottom: '10px' }}>Pathfinding</h1>
 			<div className={classes.navBar}>
 				<div className={classes.nav}>
 					<button
@@ -350,6 +360,7 @@ const Path = () => {
 							setPaintWall={setPaintWall}
 							startBtn={startBtn}
 							endBtn={endBtn}
+							widthNode={widthNode}
 						/>
 					</motion.div>
 				))}

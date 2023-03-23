@@ -10,6 +10,15 @@
     Repeat steps 4 through 7 until there are no more unvisitedNode cells or touch the end point.
     If no more unvisitedNode, it mean cannot find finish node. Return visitedNodesInOrder.
 
+# A\* algorithm
+
+Almost the same as Dijkstra algorithm, and one important aspect of A\* is f = g + h.
+
+- F is the total cost of the node. --> Recording in node.distance.
+- G is the distance between the current node and the start node. --> Recording in node.gScore.
+- H is the heuristic — estimated distance from the current node to the end node. --> Using Pythagorean theorem to caculate the distance.  
+  Before get the currentNode, use sort the node.distance to arrange the unvisitedNode.
+
 # PRIM Maze
 
 1.  Make every cell is wall and maze unvisited cell.
